@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Enviar Pedido por WhatsApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #f2f6fc;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      max-width: 460px;
+      margin: 32px auto;
+      padding: 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px #0001;
+      border: 1px solid #d1e3ff;
+    }
+    h2 {
+      text-align: center;
+      color: #3187ef;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    form {
+      background: #fff;
+      padding: 16px 18px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      color: #444;
+      font-weight: 500;
+      font-size: 15px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #b3d4fc;
+      font-size: 15px;
+      box-sizing: border-box;
+      background: #f7fbff;
+      resize: none;
+      transition: border 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #3187ef;
+      outline: none;
+    }
+    textarea {
+      min-height: 50px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .row label {
+      flex: 1;
+      margin-top: 0;
+    }
+    .base-group {
+      margin-top: 14px;
+      display: none;
+    }
+    button {
+      margin-top: 22px;
+      padding: 11px 0;
+      background: linear-gradient(90deg, #3187ef 60%, #25d366 100%);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px #3187ef33;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #25d366 60%, #3187ef 100%);
+    }
+
+    /* MEDIA QUERIES: RESPONSIVE DESIGN */
+    @media (max-width: 600px) {
+      body {
+        max-width: 100vw;
+        margin: 0;
+        padding: 4px;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+      }
+      form {
+        padding: 7px 5px;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>🛵Un Thor, por favor⚡</h2>
+  <form id="pedidoForm">
+    <label>Dirección recogida:
+      <input type="text" id="direccionRecogida" required placeholder="Ej: Mz 5 Cs 22 - Barrio">
+    </label>
+    <div class="row">
+      <label>Número quién entrega:
+        <input type="text" id="numeroEntrega" required placeholder="Ej: 3104445566">
+      </label>
+      <label>Nombre quién entrega:
+        <input type="text" id="nombreEntrega" required placeholder="Ej: Camila">
+      </label>
+    </div>
+    <label>Dirección de entrega:
+      <input type="text" id="direccionEntrega" required placeholder="Ej: Calle 19 - Barrio">
+    </label>
+    <div class="row">
+      <label>Número quién recibe:
+        <input type="text" id="numeroRecibe" required placeholder="Ej: 3115558899">
+      </label>
+      <label>Nombre quién recibe:
+        <input type="text" id="nombreRecibe" required placeholder="Ej: Jose">
+      </label>
+    </div>
+    <label>¿Qué se transporta?:
+      <textarea id="productos" required placeholder="Ejemplo: documentos, comida, paquete..."></textarea>
+    </label>
+    <label>Forma de pago:
+      <select id="pago" required>
+        <option value="">Selecciona...</option>
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+      </select>
+    </label>
+    <label>¿Necesita base?
+      <select id="necesitaBase" required>
+        <option value="">Selecciona...</option>
+        <option value="No">No</option>
+        <option value="Sí">Sí</option>
+      </select>
+    </label>
+    <div class="base-group" id="baseGroup">
+      <label>Valor de la base:
+        <input type="number" id="valorBase" min="0" placeholder="$ Valor de la base">
+      </label>
+    </div>
+    <button type="submit">Enviar por WhatsApp</button>
+  </form>
+
+  <script>
+    // Mostrar campo valor base si selecciona "Sí"
+    const necesitaBase = document.getElementById('necesitaBase');
+    const baseGroup = document.getElementById('baseGroup');
+    necesitaBase.addEventListener('change', function() {
+      baseGroup.style.display = (this.value === "Sí") ? "block" : "none";
+      document.getElementById('valorBase').required = (this.value === "Sí");
+    });
+
+    document.getElementById('pedidoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const direccionRecogida = document.getElementById('direccionRecogida').value;
+      const numeroEntrega = document.getElementById('numeroEntrega').value;
+      const nombreEntrega = document.getElementById('nombreEntrega').value;
+      const direccionEntrega = document.getElementById('direccionEntrega').value;
+      const numeroRecibe = document.getElementById('numeroRecibe').value;
+      const nombreRecibe = document.getElementById('nombreRecibe').value;
+      const productos = document.getElementById('productos').value;
+      const pago = document.getElementById('pago').value;
+      const necesitaBaseVal = document.getElementById('necesitaBase').value;
+      const valorBase = document.getElementById('valorBase').value;
+
+      let baseMensaje = "";
+      if(necesitaBaseVal === "Sí") {
+        baseMensaje = `\n¿Necesita base?: Sí\nValor base: $${valorBase}\n`;
+      } else {
+        baseMensaje = `\n¿Necesita base?: No\n`;
+      }
+
+      const mensaje = 
+        `*Un Thor, por favor*\n\n` +
+        `*Recogida*\n` +
+        `Dirección: ${direccionRecogida}\n` +
+        `Nombre: ${nombreEntrega}\n` +
+        `Número: ${numeroEntrega}\n\n` +
+        `*Entrega*\n` +
+        `Dirección: ${direccionEntrega}\n` +
+        `Nombre: ${nombreRecibe}\n` +
+        `Número: ${numeroRecibe}\n\n` +
+        `*¿Qué se transporta?:*\n${productos}\n` +
+        `*Forma de pago:* ${pago}\n` +
+        baseMensaje;
+
+      // Número de WhatsApp de la empresa (incluye código país, sin signos +)
+      const numeroEmpresa = "573059380090"; // Cambia por el número real
+
+      const url = `https://wa.me/${numeroEmpresa}?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+    });
+  </script>
+</body>
+</html>
